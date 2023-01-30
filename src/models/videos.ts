@@ -29,4 +29,12 @@ export class Videos{
     public setDuration(newDuration:number): void{
         this.duration = newDuration
     }
+
+    public getUploadDate(): string{
+        return this.uploadDate
+    }
+
+    public setUploadDate(newUploadDate:string): void{
+        this.uploadDate = newUploadDate
+    }
 }
