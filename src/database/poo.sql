@@ -12,5 +12,5 @@ DROP TABLE videos;
 
 INSERT INTO videos (id, title, duration)
 VALUES 
-    ("v001", "Mulheres", 486)
+    ("v001", "Mulheres", 486),
     ("v002", "Paternidade", 1282)
