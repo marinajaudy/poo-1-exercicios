@@ -30,3 +30,41 @@ app.get("/ping", async (req: Request, res: Response) => {
     }
 })
 
+app.get("/videos", async (req: Request, res: Response) => {
+    try {
+        const q = req.query.q
+
+        let videosDB 
+
+        if (q) {
+            const result = await db("videos").where("title", "LIKE", `%${q}%`)
+            videosDB = result
+        } else {
+            const result = await db("videos")
+            videosDB = result
+        }
+                    
+        const videos = videosDB.map((videoDB)=> new Videos(
+            videoDB.id,
+            videoDB.title,
+            videoDB.duration,
+            videoDB.uploadDate
+        ))
+
+        res.status(200).send(videos) 
+
+    } catch (error) {
+        console.log(error)
+
+        if (req.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+})
+
