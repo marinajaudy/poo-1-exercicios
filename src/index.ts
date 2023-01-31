@@ -130,3 +130,70 @@ app.post("/videos", async (req: Request, res: Response) => {
         }
     }
 })
+
+app.put("/videos/:id", async (req: Request, res: Response) => {
+    try {
+
+        const idToEdit = req.params.id
+        
+        const { id, title, duration} = req.body
+
+        if (typeof id !== "string") {
+            res.status(400)
+            throw new Error("'id' deve ser string")
+        }
+
+        if (typeof title !== "string") {
+            res.status(400)
+            throw new Error("'title' deve ser string")
+        }
+
+        if (typeof duration !== "number") {
+            res.status(400)
+            throw new Error("'duration' deve ser um number")
+        }
+        const [ videoDBExist ] =  await db("videos").where({id: idToEdit})
+
+        if (!videoDBExist) {
+            res.status(404)
+            throw new Error("'id' não encontrado")
+        }
+
+        // //1 - INSTANCIAR os dodos vindos do body
+        const newVideo = new Videos(
+            id || idToEdit ,
+            title || videoDBExist.title,
+            duration || videoDBExist.duration,
+            new Date().toISOString()
+        )
+
+        // //2 - Objeto simples para MODELAR as informações para o banco de dados
+        // const newVideoDB = {
+        //     id: newVideo.getId(),
+        //     title: newVideo.getTitle(),
+        //     duration: newVideo.getDuration(),
+        //     upload_date: newVideo.getUploadDate()
+        // }
+
+        // await db("videos").update(newVideoDB)
+
+        videoDBExist.setId()
+        videoDBExist.setTitle(newVideo.title)
+
+
+        res.status(201).send(newVideo)
+
+    } catch (error) {
+        console.log(error)
+
+        if (req.statusCode === 200) {
+            res.status(500)
+        }
+
+        if (error instanceof Error) {
+            res.send(error.message)
+        } else {
+            res.send("Erro inesperado")
+        }
+    }
+})
